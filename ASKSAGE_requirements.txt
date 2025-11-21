@@ -1,0 +1,8 @@
+## libraries to install
+asksageclient
+pip_system_certs
+requests
+jupyter
+pandas
+ipykernel
+dotenv
