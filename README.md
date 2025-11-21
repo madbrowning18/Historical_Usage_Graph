@@ -1,192 +1,180 @@
-# Historical_Usage_Graph
-Visual Depiction of Historical Usage of Documents
-AFRICOM Historical Usage Graph Library
+Historical_Usage_Graph
 
-This small library builds exploratory visualizations of AFRICOM SharePoint activity to help identify high-value documents and folders for follow-on cataloging, LLM ingestion, and knowledge-graph construction. It pulls usage data from a SharePoint Web Query (.iqy) or a saved CSV, cleans and aggregates the data, and then generates:
+Visual Depiction of Historical Document Usage
+Historical Usage Graph Library
 
-A time-series plot of document activity. 
+This library builds exploratory visualizations of SharePoint activity to help identify high-value documents and folders for follow-on cataloging, LLM ingestion, and knowledge-graph construction. It pulls usage data from a SharePoint Web Query (.iqy) or a saved CSV, cleans and aggregates the data, and then generates:
 
-africom_hist_usage_graph
+A time-series plot of document activity
 
-A hierarchical folder tree colored by document “age” (days since last modification). 
-
-africom_hist_usage_graph
+A hierarchical folder tree colored by document “age” (days since last modification)
 
 Repository Contents
 
-africom_hist_usage_graph.py – Main script that loads SharePoint data, processes it, and generates the visualizations. 
-
-africom_hist_usage_graph
+africom_hist_usage_graph.py – Main script loading SharePoint data, processing it, and generating the visualizations.
 
 utils.py – Helper functions for plotting and color mapping:
 
-hierarchy_pos – Computes node positions for a tree layout using NetworkX.
+hierarchy_pos – Computes node positions for a NetworkX tree layout
 
-plot_time – Builds an interactive time-series of activity.
+plot_time – Builds an interactive time-series of activity
 
-get_color / get_color_from_df – Map document “age” to colors for the folder tree. 
+get_color / get_color_from_df – Maps document “age” into colors for the folder tree
 
-utils
-
-africom_library_requirements_histusage.txt – List of Python libraries required to run the script. 
-
-africom_library_requirements_hi…
+africom_library_requirements_histusage.txt – List of Python libraries required to run the script
 
 1. Installation & Environment Setup
-
 Create and activate a virtual environment (recommended):
-
 python -m venv venv
 source venv/bin/activate       # macOS/Linux
 venv\Scripts\activate          # Windows
 
-
-Install required packages.
-From the project folder, run:
-
+Install required packages
 pip install pandas numpy matplotlib networkx requests plotly
 
 
-(Packages like os and datetime are part of the Python standard library and don’t need to be installed separately.) 
+(Modules like os and datetime are part of the Python standard library.)
 
-africom_library_requirements_hi…
-
-Make sure the three files (africom_hist_usage_graph.py, utils.py, and your data files) are in the same directory so the utils import works correctly.
+Ensure africom_hist_usage_graph.py, utils.py, and your data files are stored in the same directory, so the utils import resolves correctly.
 
 2. Preparing the SharePoint Data
 
-The script expects AFRICOM SharePoint usage data in one of two forms: 
+The script expects SharePoint document-usage data in one of two forms:
 
-africom_hist_usage_graph
+Option A — .iqy Web Query file (preferred)
 
-Preferred – .iqy Web Query file
+Export usage or document library data from SharePoint as an Excel Web Query (query.iqy)
 
-Export usage or document library data from SharePoint as an Excel Web Query (query.iqy) and save it into this project folder as query.iqy.
+Save query.iqy into the project folder
 
-When you run the script, it will:
+When the script runs, it will attempt to:
 
-Read the URL from query.iqy.
+Read the URL stored in query.iqy
 
-Attempt to download a fresh CSV (africom_sharepoint_query.csv) via HTTP.
+Download a fresh CSV named africom_sharepoint_query.csv
 
-If it receives a 401 Unauthorized, follow the console instructions:
+If a 401 Unauthorized occurs:
 
-Open query.iqy in Excel.
+Open query.iqy in Excel
 
-Refresh the data with your SharePoint credentials.
+Refresh the data using your credentials
 
-Save the results as africom_sharepoint_query.csv in this same folder.
+Save the output as africom_sharepoint_query.csv
 
-Re-run the script.
+Re-run the script
 
-Alternative – Pre-saved CSV
+Option B — Pre-saved CSV
 
-If you already have a SharePoint export, save it as:
+If you already have the export, save it as:
 
 africom_sharepoint_query.csv
 
 
-Place it in the project folder. The script will detect and load it directly.
+Place it in the project folder and the script will load it automatically.
 
-The CSV must contain at least the following columns:
+Required Columns
 
-Path – Full folder/file path in SharePoint.
+Your CSV must include:
 
-Modified – Last modified date/time for the item. 
+Path – The full folder/file path in SharePoint
 
-africom_hist_usage_graph
+Modified – Last modified timestamp for that item
 
 3. Running the Script
 
-Once your environment and data are ready:
+Once the environment and dataset are ready:
 
 python africom_hist_usage_graph.py
 
+What the script does:
 
-What the script does: 
+Validates that the utils module is imported correctly
 
-africom_hist_usage_graph
-
-Confirms the utils import and prints its file location.
-
-Loads data from africom_sharepoint_query.csv, either downloaded from query.iqy or provided manually.
+Loads data from africom_sharepoint_query.csv
 
 Processes the data:
 
-Converts Modified to a datetime column date.
+Converts Modified → date
 
-Groups by Path to compute the most recent modification date per path.
+Aggregates by Path
 
-Computes age (days since last modification).
+Computes age (days since last modification)
 
-Assigns a color based on age (green → recently modified, red → stale).
+Assigns colors based on age (green → recent, red → stale)
 
 Generates visualizations:
 
-A time-series line chart of document activity over time using plot_time from utils.py.
+Time-series chart of document activity using plot_time
 
-A hierarchical folder tree using the Path values and NetworkX, with node colors driven by age and the color mapping functions in utils.py.
+Hierarchical folder tree built from the Path structure
 
-The plots are interactive (using Plotly and Matplotlib) and open in your browser or notebook, depending on your environment.
+Node colors correspond to document age
+
+Plots open interactively in your notebook or browser depending on your configuration.
 
 4. Interpreting the Outputs
-
 Time-Series Plot (Activity Over Time)
 
-X-axis: calendar time.
+X-axis: calendar date
 
-Y-axis: count of document modifications (or events) in the chosen interval.
+Y-axis: number of document events
 
-Use this view to spot spikes in activity, exercises, or surges tied to specific operations.
+Helps identify periods of high or low document activity
 
 Hierarchical Folder Tree
 
-Each node is a folder or file derived from the Path hierarchy.
+Each node corresponds to a folder or file
 
-Node color reflects recency of modification:
+Node color indicates recency:
 
-Green: recently modified.
+Green: recently modified
 
-Yellow/Orange: moderate age.
+Yellow/Orange: moderate age
 
-Red: older or potentially stale content.
+Red: stale content
 
-Use this view to identify:
+Useful for:
 
-Heavily used areas of the SharePoint structure.
+Finding heavily used areas of the repository
 
-Cold zones that may be candidates for archiving.
+Identifying content candidates for archiving
 
-Priority candidates for metadata tagging, KG building, or LLM ingestion.
+Prioritizing documents for tagging, knowledge-graph creation, or LLM ingestion
 
 5. Customization
 
-You can customize several aspects by editing utils.py or africom_hist_usage_graph.py:
+You can adjust behavior by editing utils.py or africom_hist_usage_graph.py:
 
-Color thresholds (in get_color) to reflect your own age bands.
+Modify color thresholds in get_color
 
-Resampling frequency (breaks argument in plot_time) to switch between daily, weekly, or monthly activity.
+Change time-resampling (breaks in plot_time)
 
-Figure size and node size in the folder tree plotting call to match your display or slide needs.
+Adjust figure size or node size in the tree graph
 
-Input CSV path or column names, if your SharePoint export uses different headers.
+Update CSV paths or column names if your exports differ
 
 6. Troubleshooting
-
 KeyError: 'Path' or 'Modified' not found
 
-Confirm your CSV includes both columns with these exact names, or adjust the script to match your actual column headers.
+Ensure your CSV contains these exact column names, or update the script.
 
-401 / authentication issues when downloading from .iqy
+401 Unauthorized for .iqy downloads
 
-Use Excel with query.iqy to refresh the query and save a local CSV, as described above.
+Open the .iqy in Excel, refresh with your credentials, save a local CSV, and rerun the script.
 
-ModuleNotFoundError for a library
+Missing Python library
 
-Re-run pip install for the missing package, or verify your virtual environment is activated.
+Reinstall via:
+
+pip install <library-name>
+
+
+Verify your virtual environment is active.
 
 Plots not appearing
 
-In some IDEs you may need to configure the Plotly renderer or ensure the script is run in an environment that supports interactive plots (e.g., Jupyter, VS Code with Python extension, or a browser).
+Some IDEs require configuring the Plotly renderer or running inside a Jupyter environment.
 
-This library is intentionally minimal and designed as a first step in AFRICOM’s knowledge-management pipeline: it doesn’t interpret content, but it surfaces where people are working and what is active, providing a prioritized list of documents and paths for deeper AI/ML analysis.
+Purpose of This Library
+
+This tool provides a quick, low-overhead method to understand usage patterns in large collections of SharePoint documents. While it does not interpret content, it highlights where the most activity occurs and which documents are most likely to be relevant—helping focus deeper analytic, cataloging, or AI/ML work.
